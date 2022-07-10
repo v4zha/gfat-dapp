@@ -2,8 +2,6 @@ import express, { Application } from "express";
 import "dotenv/config";
 import { observer } from "./api/login";
 import { createClient } from "redis";
-import { department } from "./Types/types";
-import { GFAT } from "./api/gfat";
 
 const PORT = process.env.PORT || 8000;
 
@@ -27,7 +25,8 @@ app.get("/departments", async (_req, res) => {
   try {
     await client.connect();
   } catch {}
-  client.lPush("departments", dep);
+  await client.del("deparments");
+  await client.lPush("departments", dep);
   res.send({
     message: dep,
   });
@@ -53,7 +52,8 @@ app.get("/projects", async (_req, res) => {
   try {
     await client.connect();
   } catch {}
-  client.lPush("projects", prj);
+  await client.del('projects');
+  await client.lPush("projects", prj);
   res.send({
     message: prj,
   });
@@ -79,7 +79,8 @@ app.get("/officers", async (_req, res) => {
   try {
     await client.connect();
   } catch {}
-  client.lPush("officers", off);
+  await client.del('officers');
+  await client.lPush("officers", off);
   res.send({
     message: off,
   });
@@ -103,7 +104,8 @@ app.get("/transactions", async (_req, res) => {
   try {
     await client.connect();
   } catch {}
-  client.lPush("transactions", trx);
+  await client.del("transactions");
+  await client.lPush("transactions", trx);
   res.send({
     message: trx,
   });

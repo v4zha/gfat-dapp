@@ -13,13 +13,6 @@ const client = (0, redis_1.createClient)();
 client.on("error", (err) => console.log("Redis Client Error", err));
 app.get("/get_admin", async (_req, res) => {
     const gfat = await (0, login_1.observer)();
-    // console.log("gfat : "+JSON.stringify(gfat));
-    // try {
-    // observer().then(gfat=>gfat).catch(err=>console.log("gfat init err : "+err))
-    // .then((gfat)=>{(gfat as GFAT).getAdmin()}).then(admin=>console.log("admin : "+admin)).catch(err=>console.log("admin call err : "+err));
-    // } catch (err) {
-    //   console.log("gfat err : " + err);
-    // }
     const admin = await gfat.getAdmin();
     res.send({
         message: admin,
@@ -32,7 +25,8 @@ app.get("/departments", async (_req, res) => {
         await client.connect();
     }
     catch (_a) { }
-    client.lPush("departments", dep);
+    await client.del("deparments");
+    await client.lPush("departments", dep);
     res.send({
         message: dep,
     });
@@ -57,7 +51,8 @@ app.get("/projects", async (_req, res) => {
         await client.connect();
     }
     catch (_a) { }
-    client.lPush("projects", prj);
+    await client.del('projects');
+    await client.lPush("projects", prj);
     res.send({
         message: prj,
     });
@@ -82,7 +77,8 @@ app.get("/officers", async (_req, res) => {
         await client.connect();
     }
     catch (_a) { }
-    client.lPush("officers", off);
+    await client.del('officers');
+    await client.lPush("officers", off);
     res.send({
         message: off,
     });
@@ -106,7 +102,8 @@ app.get("/transactions", async (_req, res) => {
         await client.connect();
     }
     catch (_a) { }
-    client.lPush("transactions", trx);
+    await client.del("transactions");
+    await client.lPush("transactions", trx);
     res.send({
         message: trx,
     });
