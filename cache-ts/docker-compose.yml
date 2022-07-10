@@ -2,10 +2,25 @@ services:
   gfat-cache:
     image: "redis"
     container_name: "gfat-cache"
+    networks:
+      - gfat-network
     ports:
-      - 6379:6379
+      - 6379
     volumes:
-      - redis-data:/data 
+      - redis-data:/data
+  nginx:
+    image: "nginx:latest"
+    networks:
+      - gfat-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - userauth
+    ports:
+      - 80:80
 volumes:
   redis-data:
+    external: true
+networks:
+  gfat-network:
     external: true
