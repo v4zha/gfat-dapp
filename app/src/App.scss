@@ -1,0 +1,17 @@
+@use "/src/global";
+
+html{
+    height: 100%;
+}
+body{
+    min-height: 100%;
+    background-image: url("/src/assets/logo.svg");
+    background-repeat: no-repeat;
+    background-size: 50%;
+    background-position: 100%;
+    z-index: -1;
+    background-color: global.$bg;
+}
+input[type=number]::-webkit-inner-spin-button {
+    color:global.$secondary;
+}

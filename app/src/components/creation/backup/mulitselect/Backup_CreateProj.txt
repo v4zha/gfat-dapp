@@ -1,0 +1,184 @@
+import {
+  Controller,
+  SubmitHandler,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  SelectChangeEvent,
+} from "@mui/material";
+import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { District, State } from "../../../../Types/types";
+import { GFAT } from "../../../../api/gfat";
+import { DepDropDown } from "../../DepdropDown";
+import { OffDropDown } from "./backup_OffDropDown";
+import { DepInfo, OffInfo, depOffInfo } from "../../../../services/DataFetch";
+import { useDepInfo } from "../../CreationHooks";
+
+export interface ProjForm {
+  pname: string;
+  dep_id: number;
+  district: District;
+  // off_addr: { addr: string }[];
+  off_addr: string[];
+}
+
+function CreateProj() {
+  const gfat: GFAT = useSelector((state: State) => {
+    return state.gfat.value;
+  });
+
+  const dep_info = useDepInfo();
+
+  const [result, setRes] = useState<JSX.Element>();
+
+  const [depId, setDepId] = useState(0);
+
+  //list of officers in department
+  const [offInfo, setOffInfo] = useState<Array<OffInfo>>([]);
+
+  const [assignedOff, setAssignedOff] = useState<Array<string>>([]);
+
+  useEffect(() => {
+    const off_info = async () => {
+      if (depId == 0) {
+        return null;
+      }
+      const res = await depOffInfo(gfat, depId);
+      setOffInfo(res);
+    };
+    off_info();
+  }, [depId]);
+
+  const { register, control, handleSubmit } = useForm<ProjForm>({
+    defaultValues: {
+      pname: "",
+      dep_id: 0,
+      // off_addr: [{ addr: "" }],
+      off_addr: [],
+    },
+  });
+
+  // const { fields,} = useFieldArray({
+  //   name: "off_addr",
+  //   control,
+  // });
+
+  const onSubmit: SubmitHandler<ProjForm> = async (data: ProjForm) => {
+    // const officers = data.off_addr.map((off_addr) => off_addr.addr);
+    // const res = await gfat.project.createProject(
+    //   data.pname,
+    //   data.dep_id,
+    //   data.district,
+    //   // officers
+    //   data.off_addr
+    // );
+    setRes(
+      <div>
+        <h1>Result</h1>
+        <span>
+          {/* Created Project {data.pname} with id : {res} */}
+        </span>
+        <br />
+      </div>
+    );
+  };
+
+  const depSelectionHandler = (ele: SelectChangeEvent) => {
+    const dep_id = Number(ele.target.value);
+    setDepId(dep_id);
+  };
+  // const offSelectionHandler = (ele: SelectChangeEvent) => {
+  //   const off = ele.target.value;
+  //   setSelectedOff(off);
+  // };
+
+  const offSelectionHandler = (event: SelectChangeEvent) => {
+    const off=event.target.value;
+    let assigned_off=assignedOff;
+    assigned_off.push(off);
+    setAssignedOff(assigned_off);
+  };
+
+  return (
+    <div>
+      <h1>Create Project</h1>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <Controller
+            name="pname"
+            control={control}
+            render={({ field }) => (
+              <TextField label="Project name" variant="outlined" {...field} />
+            )}
+          />
+        </div>
+        <br />
+        <div>
+          <DepDropDown
+            value={"dep_id"}
+            dep_info={dep_info as Array<DepInfo>}
+            form_register={register}
+            onChange={depSelectionHandler}
+          />
+        </div>
+        <br />
+        <div>
+          <FormControl>
+            <InputLabel id="dep_sit_select">District</InputLabel>
+            <Select
+              style={{ width: 200 }}
+              labelId="dep_dist_select"
+              label="District"
+              {...register("district")}
+            >
+              <MenuItem value={District.Thiruvananthapuram}>
+                Thiruvananthapuram
+              </MenuItem>
+              <MenuItem value={District.Kollam}>Kollam</MenuItem>
+              <MenuItem value={District.Pathanamthitta}>
+                Pathanamthitta
+              </MenuItem>
+              <MenuItem value={District.Alappuzha}>Alappuzha</MenuItem>
+              <MenuItem value={District.Kottayam}>Kottayam</MenuItem>
+              <MenuItem value={District.Idukki}>Idukki</MenuItem>
+              <MenuItem value={District.Ernakulam}>Ernakulam</MenuItem>
+              <MenuItem value={District.Thrissur}>Thrissur</MenuItem>
+              <MenuItem value={District.Palakkad}>Palakkad</MenuItem>
+              <MenuItem value={District.Malapuram}>Malapuram</MenuItem>
+              <MenuItem value={District.Kozhikode}>Kozhikode</MenuItem>
+              <MenuItem value={District.Wayanad}>Wayanad</MenuItem>
+              <MenuItem value={District.Kannur}>Kannur</MenuItem>
+              <MenuItem value={District.Kasargod}>Karasgod</MenuItem>
+            </Select>
+          </FormControl>
+          <br />
+        </div>
+        <br />
+        <FormControl>
+        <OffDropDown
+          value={assignedOff}
+          form_register={register}
+          onChange={offSelectionHandler}
+          off_list={offInfo}
+        />
+        </FormControl>
+        <br />
+        <Button type="submit" variant="contained">
+          Submit
+        </Button>
+      </form>
+      <br />
+      <br />
+      {result}
+    </div>
+  );
+}
+export default CreateProj;

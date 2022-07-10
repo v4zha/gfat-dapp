@@ -1,0 +1,52 @@
+import { OffInfo } from "../../../../services/DataFetch";
+import {
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  SelectChangeEvent,
+  OutlinedInput,
+} from "@mui/material";
+import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+
+export interface OffDropDownProps<T extends FieldValues> {
+  off_list: Array<OffInfo>;
+  form_register: UseFormRegister<T>;
+  value: Array<string>;
+  onChange?: (event: SelectChangeEvent) => void;
+}
+const OptList = (off_list: Array<OffInfo>): Array<JSX.Element> | null => {
+  if (!off_list) {
+    return null;
+  }
+  const list: Array<JSX.Element> = off_list.map(({ off_addr, name }) => (
+    <MenuItem key={`off-${name}`}>{name}</MenuItem>
+  ));
+  return list;
+};
+export function OffDropDown<T extends FieldValues>(props: OffDropDownProps<T>) {
+  if (!props.off_list) {
+    return null;
+  }
+  return (
+    <>
+      <FormControl>
+        <InputLabel id="off_DropDown">Officers</InputLabel>
+        <Select
+          multiple={true}
+          value={props.off_list}
+            // input={<OutlinedInput label="Tag" />}
+          // renderValue={(selected) => selected.join(', ')}
+          // MenuProps={MenuProps}
+          style={{ width: 200 }}
+          labelId="off_DropDown"
+          label="officers"
+          // {...props.form_register("off_addr" as Path<T>)}
+          onChange={props.onChange}
+        >
+          {OptList(props.off_list)}
+        </Select>
+      </FormControl>
+    </>
+  );
+}
